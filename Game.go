@@ -26,22 +26,19 @@ func main() {
 	fmt.Printf("Player names : %v \n", playerarr)
 	shuffledarr := shuffle(playerarr)
 	fmt.Printf("Random array  :%v \n", shuffledarr)
-	finalscorecard["Round1"] = gameplay(shuffledarr, players)
-	//fmt.Printf("Final Score Card : %v \n", finalscorecard)
+	finalscorecard["Round1"] = gameplay(shuffledarr, players, "Round1")
 	shuffledarr = getwinners(finalscorecard["Round1"])
-	finalscorecard["Round2"] = gameplay(shuffledarr, players)
-	//fmt.Printf("Final Score Card R2: %v \n", finalscorecard)
+	finalscorecard["Round2"] = gameplay(shuffledarr, players, "Round2")
 	shuffledarr = getwinners(finalscorecard["Round2"])
-	finalscorecard["Round3"] = gameplay(shuffledarr, players)
-	fmt.Printf("Final Score Card: %v \n", finalscorecard)
+	finalscorecard["Round3"] = gameplay(shuffledarr, players, "Round3")
 	shuffledarr = getwinners(finalscorecard["Round3"])
-	fmt.Printf("Champion ===> %v \n\n", shuffledarr)
 	finalscores, err := json.Marshal(finalscorecard)
 	if err != nil {
 		fmt.Printf("JSON Encoding Failed")
 		fmt.Printf("Final Score Card: %v \n", finalscorecard)
 	}
 	fmt.Printf("Final Score Card: %v \n", string(finalscores))
+	fmt.Printf("CHAMPION ==> %v \n\n", shuffledarr)
 }
 func getwinners(scorearr map[string]int) []string {
 	var winnerarr = []string{}
@@ -54,13 +51,13 @@ func getwinners(scorearr map[string]int) []string {
 	return winners
 
 }
-func gameplay(shuffledarr []string, players map[string]int) map[string]int {
+func gameplay(shuffledarr []string, players map[string]int, round string) map[string]int {
 	var scorecard = map[string]int{}
 	for k := 0; k < len(shuffledarr); {
 		play(shuffledarr[k:k+2], players, scorecard)
 		k = k + 2
 	}
-	fmt.Printf("SCORECARD :%v \n", scorecard)
+	fmt.Printf("SCORECARD %v :%v \n", round, scorecard)
 	return scorecard
 
 }
@@ -78,7 +75,7 @@ func play(playerrr []string, players map[string]int, scorecard map[string]int) {
 		if scorecard[offensive] < 5 {
 			play(playerrr, players, scorecard)
 		} else if scorecard[offensive] == 5 {
-			fmt.Println(offensive + " is Winner! of Game *****************!!")
+			fmt.Println(offensive + " is Winner! of Game !!!")
 			return
 		}
 
@@ -86,16 +83,15 @@ func play(playerrr []string, players map[string]int, scorecard map[string]int) {
 		//fmt.Println("Defender is Winner!!!")
 		scorecard[defender] = scorecard[defender] + 1
 		if scorecard[defender] < 5 {
+			fmt.Printf("Switching roles \n")
 			playerswitch := []string{defender, offensive}
 			play(playerswitch, players, scorecard)
 		} else if scorecard[defender] == 5 {
-			fmt.Println(defender + " is Winner! of Game ********************!!")
+			fmt.Println(defender + " is Winner! of Game !!!")
 			return
 		}
 	}
-	// playerswitch := []string{defender, offensive}
-	// play(playerswitch, players)
-	//fmt.Printf("SCORECARD :%v \n", scorecard)
+
 }
 
 func shuffle(src []string) []string {
@@ -112,14 +108,17 @@ func shuffle(src []string) []string {
 func getrandomnumber() int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	num := rand.Intn(10)
-	return num
+	return num + 1
 
 }
 
 func getrandomarray(size int) []int {
-	rand.Seed(time.Now().UTC().UnixNano())
-	perm := rand.Perm(size)
-	return perm
+	var defenarr = []int{}
+	for i := 0; i < size; size-- {
+		rand.Seed(time.Now().UTC().UnixNano())
+		defenarr = append(defenarr, rand.Intn(10)+1)
+	}
+	return defenarr
 
 }
 
